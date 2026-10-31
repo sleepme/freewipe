@@ -1,0 +1,5 @@
+# Cross-compiling from Linux to Windows with MinGW-w64:
+#   cargo build --release --target x86_64-pc-windows-gnu
+# Native builds on Windows (x86_64-pc-windows-msvc) need nothing here.
+[target.x86_64-pc-windows-gnu]
+linker = "x86_64-w64-mingw32-gcc"

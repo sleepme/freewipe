@@ -1,0 +1,60 @@
+name: Release
+
+# Publish: git tag v1.0.0 && git push origin v1.0.0
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build CLI + GUI
+        run: cargo build --release --locked
+      - name: Build Explorer extension (DLL)
+        run: cargo build --profile shell --locked -p freewipe-shell
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $v = "${{ github.ref_name }}"
+          $d = "freewipe-$v-windows-x64"
+          New-Item -ItemType Directory $d | Out-Null
+          Copy-Item target/release/freewipe.exe, target/release/freewipe-gui.exe, target/shell/freewipe_shell.dll $d
+          Copy-Item locales -Recurse $d/locales
+          Copy-Item README.md, LICENSE-MIT, LICENSE-APACHE, CHANGELOG.md $d
+          Compress-Archive -Path $d -DestinationPath "$d.zip"
+          (Get-FileHash "$d.zip" -Algorithm SHA256).Hash.ToLower() + "  $d.zip" | Out-File "$d.zip.sha256" -Encoding ascii
+
+      - name: Release notes (CHANGELOG section + template)
+        shell: pwsh
+        run: |
+          $v = "${{ github.ref_name }}".TrimStart("v")
+          $tagVer = (Select-String -Path Cargo.toml -Pattern '^version = "(.+)"' | Select-Object -First 1).Matches[0].Groups[1].Value
+          if ($tagVer -ne $v) { throw "Tag v$v does not match Cargo.toml version $tagVer" }
+          $lines = Get-Content CHANGELOG.md -Encoding utf8
+          $start = ($lines | Select-String -Pattern "^## \[$([regex]::Escape($v))\]" | Select-Object -First 1).LineNumber
+          if (-not $start) { throw "CHANGELOG.md has no section for $v" }
+          $section = @()
+          foreach ($l in $lines[$start..($lines.Count - 1)]) {
+            if ($l -match '^## ' -or $l -match '^\[[^\]]+\]: ') { break }
+            $section += $l
+          }
+          $template = (Get-Content .github/RELEASE_TEMPLATE.md -Raw -Encoding utf8).Replace("vX.Y.Z", "v$v")
+          (($section -join "`n").Trim() + "`n`n" + $template) | Out-File release-notes.md -Encoding utf8
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: freewipe ${{ github.ref_name }}
+          files: |
+            freewipe-*.zip
+            freewipe-*.zip.sha256
+          body_path: release-notes.md
+          draft: true   # review the notes, then press "Publish"
