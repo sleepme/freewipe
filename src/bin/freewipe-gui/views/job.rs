@@ -346,7 +346,11 @@ pub fn show(app: &mut App, ui: &mut Ui) {
                             ui.label(RichText::new(icon).color(color));
                             ui.add(egui::Label::new(name).truncate());
                             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                                ui.add(egui::Label::new(RichText::new(extra).size(12.0).color(p.muted)).truncate());
+                                ui.add(
+                                    egui::Label::new(RichText::new(extra).size(12.0).color(p.muted))
+                                        .truncate()
+                                        .selectable(true),
+                                );
                             });
                         });
                     }
@@ -372,7 +376,9 @@ pub fn show(app: &mut App, ui: &mut Ui) {
                 .auto_shrink([false, false])
                 .show(ui, |ui| {
                     for l in &jv.log {
-                        ui.label(RichText::new(l).monospace().size(12.0).color(p.muted));
+                        ui.add(
+                            egui::Label::new(RichText::new(l).monospace().size(12.0).color(p.muted)).selectable(true),
+                        );
                     }
                 });
         });

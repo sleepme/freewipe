@@ -6,6 +6,9 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- Text in the desktop app is no longer selectable, like in other Windows programs. The log, error messages, report paths and the "files in use" details can still be selected and copied.
+
 ## [1.0.0] - 2026-10-31
 
 First public release.

@@ -67,7 +67,10 @@ pub fn show(app: &mut App, ui: &mut Ui) {
     if refresh || app.reports.is_none() {
         app.reports = Some(load(&dir));
     }
-    ui.label(RichText::new(dir.display().to_string()).monospace().size(12.0).color(p.muted));
+    ui.add(
+        egui::Label::new(RichText::new(dir.display().to_string()).monospace().size(12.0).color(p.muted))
+            .selectable(true),
+    );
     if !app.settings.save_reports {
         widgets::hint(ui, &tr!("gui.reports_off"));
     }
@@ -114,7 +117,7 @@ pub fn show(app: &mut App, ui: &mut Ui) {
                         });
                     }
                     None => {
-                        ui.label(r.path.display().to_string());
+                        ui.add(egui::Label::new(r.path.display().to_string()).selectable(true));
                     }
                 });
             });

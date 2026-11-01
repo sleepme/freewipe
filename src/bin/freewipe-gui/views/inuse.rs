@@ -35,10 +35,12 @@ pub fn panel(app: &mut App, ui: &mut Ui, compact: bool) {
             } else {
                 names.join(", ")
             };
-            ui.label(RichText::new(tr!("gui.inuse_by", apps = list)).size(12.5));
+            ui.add(egui::Label::new(RichText::new(tr!("gui.inuse_by", apps = list)).size(12.5)).selectable(true));
         }
         if let Some((ok, m)) = &msg {
-            ui.label(RichText::new(m).size(12.0).color(if *ok { p.muted } else { p.err }));
+            ui.add(
+                egui::Label::new(RichText::new(m).size(12.0).color(if *ok { p.muted } else { p.err })).selectable(true),
+            );
         }
         ui.add_space(4.0);
         ui.horizontal_wrapped(|ui| {

@@ -154,7 +154,7 @@ fn progress(app: &mut App, ui: &mut Ui) {
                     ui.horizontal(|ui| {
                         ui.label(RichText::new(icon).color(color));
                         ui.add(egui::Label::new(name).truncate());
-                        ui.label(RichText::new(extra).size(11.5).color(p.muted));
+                        ui.add(egui::Label::new(RichText::new(extra).size(11.5).color(p.muted)).selectable(true));
                     });
                 }
             });

@@ -143,6 +143,9 @@ pub fn install(ctx: &egui::Context, theme: SettingsTheme) {
         s.spacing.button_padding = egui::vec2(14.0, 7.0);
         s.spacing.interact_size.y = 30.0;
         s.spacing.combo_height = 400.0;
+        // Like a native Windows app: labels are not selectable. Text worth
+        // copying (log, errors, paths) opts in with `Label::selectable(true)`.
+        s.interaction.selectable_labels = false;
     });
     apply_theme(ctx, theme);
 }
