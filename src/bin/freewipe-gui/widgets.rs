@@ -32,38 +32,93 @@ pub fn toggle(ui: &mut Ui, on: &mut bool) -> Response {
     resp
 }
 
+/// Blend two colours (`t` = 0 → `a`, 1 → `b`).
+fn mix(a: Color32, b: Color32, t: f32) -> Color32 {
+    let l = |x: u8, y: u8| (f32::from(x) + (f32::from(y) - f32::from(x)) * t).round() as u8;
+    Color32::from_rgb(l(a.r(), b.r()), l(a.g(), b.g()), l(a.b(), b.b()))
+}
+
+/// Colours of a button in its normal, hovered and pressed states.
+struct Look {
+    fill: Color32,
+    stroke: Color32,
+    hover_fill: Color32,
+    hover_stroke: Color32,
+    press_fill: Color32,
+}
+
+/// A button whose colours change on hover and press. Setting `fill`/`stroke`
+/// on an `egui::Button` freezes them for every state, so the colours go into
+/// the widget visuals of a local scope instead.
+fn styled(ui: &mut Ui, text: RichText, look: Look, min_h: f32) -> Response {
+    ui.scope(|ui| {
+        let w = &mut ui.visuals_mut().widgets;
+        for (v, fill, stroke) in [
+            (&mut w.inactive, look.fill, look.stroke),
+            (&mut w.hovered, look.hover_fill, look.hover_stroke),
+            (&mut w.active, look.press_fill, look.hover_stroke),
+        ] {
+            v.bg_fill = fill;
+            v.weak_bg_fill = fill;
+            v.bg_stroke = Stroke::new(1.0, stroke);
+            v.corner_radius = CornerRadius::same(8);
+            v.expansion = 0.0;
+        }
+        ui.add(egui::Button::new(text).min_size(Vec2::new(0.0, min_h))).on_hover_cursor(egui::CursorIcon::PointingHand)
+    })
+    .inner
+}
+
+/// Look of the filled accent button.
+fn accent_look(ui: &Ui) -> Look {
+    let p = pal(ui);
+    Look {
+        fill: p.accent,
+        stroke: p.accent,
+        hover_fill: mix(p.accent, Color32::WHITE, 0.14),
+        hover_stroke: mix(p.accent, Color32::WHITE, 0.14),
+        press_fill: mix(p.accent, Color32::BLACK, 0.12),
+    }
+}
+
 /// Big filled accent button.
 pub fn primary(ui: &mut Ui, text: impl Into<String>) -> Response {
     let p = pal(ui);
-    ui.add(
-        egui::Button::new(RichText::new(text.into()).color(p.on_accent).strong())
-            .fill(p.accent)
-            .stroke(Stroke::NONE)
-            .min_size(Vec2::new(0.0, 42.0))
-            .corner_radius(CornerRadius::same(8)),
-    )
+    let look = accent_look(ui);
+    styled(ui, RichText::new(text.into()).color(p.on_accent).strong(), look, 42.0)
+}
+
+/// Filled accent button of normal height (dialogs).
+pub fn accent(ui: &mut Ui, text: impl Into<String>) -> Response {
+    let p = pal(ui);
+    let look = accent_look(ui);
+    styled(ui, RichText::new(text.into()).color(p.on_accent), look, 36.0)
 }
 
 /// Outlined secondary button.
 pub fn secondary(ui: &mut Ui, text: impl Into<String>) -> Response {
     let p = pal(ui);
-    ui.add(
-        egui::Button::new(RichText::new(text.into()).color(p.text))
-            .fill(p.card)
-            .stroke(Stroke::new(1.0, p.border))
-            .min_size(Vec2::new(0.0, 36.0)),
-    )
+    let look = Look {
+        fill: p.card,
+        stroke: p.border,
+        hover_fill: p.card_hi,
+        hover_stroke: mix(p.border, p.accent, 0.6),
+        press_fill: mix(p.card_hi, p.border, 0.5),
+    };
+    styled(ui, RichText::new(text.into()).color(p.text), look, 36.0)
 }
 
 /// Danger-tinted secondary button (Stop).
 pub fn danger(ui: &mut Ui, text: impl Into<String>) -> Response {
     let p = pal(ui);
-    ui.add(
-        egui::Button::new(RichText::new(text.into()).color(p.err))
-            .fill(p.accent_soft)
-            .stroke(Stroke::new(1.0, p.accent))
-            .min_size(Vec2::new(0.0, 40.0)),
-    )
+    let look = Look {
+        fill: p.accent_soft,
+        stroke: p.accent,
+        hover_fill: mix(p.accent_soft, p.accent, 0.22),
+        hover_stroke: p.accent,
+        press_fill: mix(p.accent_soft, p.accent, 0.4),
+    };
+    styled(ui, RichText::new(text.into()).color(p.err), look, 40.0)
 }
 
 /// Rounded pill with text (painted, so it never stretches with its cell).

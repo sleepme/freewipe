@@ -59,7 +59,7 @@ pub const REPOSITORY: &str = env!("CARGO_PKG_REPOSITORY");
 /// Author's profile.
 pub const AUTHOR_URL: &str = "https://github.com/sleepme";
 /// Where to support the project.
-pub const DONATE_URL: &str = "https://ko-fi.com/tovld";
+pub const DONATE_URL: &str = "https://github.com/sleepme/freewipe#support-the-project";
 
 /// The application icon (also written next to the registry entries so the
 /// context menu can show it).

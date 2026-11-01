@@ -8,6 +8,8 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 - Text in the desktop app is no longer selectable, like in other Windows programs. The log, error messages, report paths and the "files in use" details can still be selected and copied.
+- Buttons react to the mouse: they change colour on hover and when pressed, and the pointer turns into a hand.
+- *About → Support the project* links to the support section of the project page.
 
 ## [1.0.0] - 2026-10-31
 

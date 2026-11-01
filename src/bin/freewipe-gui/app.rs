@@ -1097,7 +1097,6 @@ impl App {
         if !self.confirm_exit {
             return;
         }
-        let p = pal(ui);
         let resp = egui::Modal::new(egui::Id::unique("confirm-exit")).show(&ctx, |ui| {
             ui.set_width(420.0);
             ui.heading(tr!("gui.exit_title"));
@@ -1108,14 +1107,7 @@ impl App {
                 if widgets::secondary(ui, tr!("gui.exit_continue")).clicked() {
                     self.confirm_exit = false;
                 }
-                if ui
-                    .add(
-                        egui::Button::new(RichText::new(tr!("gui.exit_stop")).color(p.on_accent))
-                            .fill(p.accent)
-                            .corner_radius(CornerRadius::same(8)),
-                    )
-                    .clicked()
-                {
+                if widgets::accent(ui, tr!("gui.exit_stop")).clicked() {
                     self.exit_now = true;
                     self.confirm_exit = false;
                     if let Some(j) = &self.job {
