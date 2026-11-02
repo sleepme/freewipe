@@ -11,6 +11,9 @@ and the project follows [Semantic Versioning](https://semver.org/).
 - Buttons react to the mouse: they change colour on hover and when pressed, and the pointer turns into a hand.
 - *About → Support the project* links to the support section of the project page.
 
+### Fixed
+- With *Use a single pass on SSD / flash*, the progress bar stopped at about 50% and the confirmation showed the full method's total: totals, the pass list and the confirmation now reflect the single pass used on SSD/flash.
+
 ## [1.0.0] - 2026-10-31
 
 First public release.

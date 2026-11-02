@@ -192,6 +192,7 @@
   "gui.confirm_sub": "Później nie będzie można odzyskać danych.",
   "gui.c_data": "Dane",
   "gui.c_method": "Metoda",
+  "gui.c_ssd_one_pass": "SSD / flash: 1 przebieg",
   "gui.c_verify": "Weryfikacja",
   "gui.c_after": "Następnie",
   "gui.c_write": "Łącznie do zapisania",

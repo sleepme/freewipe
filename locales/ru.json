@@ -192,6 +192,7 @@
   "gui.confirm_sub": "Восстановить данные после этого будет невозможно.",
   "gui.c_data": "Данные",
   "gui.c_method": "Метод",
+  "gui.c_ssd_one_pass": "SSD / флеш: 1 проход",
   "gui.c_verify": "Проверка",
   "gui.c_after": "После",
   "gui.c_write": "Всего записать",

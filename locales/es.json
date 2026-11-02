@@ -192,6 +192,7 @@
   "gui.confirm_sub": "Los datos no podrán recuperarse después.",
   "gui.c_data": "Datos",
   "gui.c_method": "Método",
+  "gui.c_ssd_one_pass": "SSD / flash: 1 pasada",
   "gui.c_verify": "Verificación",
   "gui.c_after": "Después",
   "gui.c_write": "Total a escribir",

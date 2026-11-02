@@ -192,6 +192,7 @@
   "gui.confirm_sub": "Die Daten können danach nicht wiederhergestellt werden.",
   "gui.c_data": "Daten",
   "gui.c_method": "Verfahren",
+  "gui.c_ssd_one_pass": "SSD / Flash: 1 Durchgang",
   "gui.c_verify": "Prüfung",
   "gui.c_after": "Danach",
   "gui.c_write": "Insgesamt zu schreiben",

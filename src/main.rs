@@ -266,7 +266,7 @@ fn run_wipe(targets: Vec<Target>, c: &Common, extra: FreeExtras) -> Result<u8> {
     install_ctrlc(cancel.clone());
 
     // 5. Run.
-    let total: u64 = runnable.iter().map(|p| p.work_bytes(passes, opts.verify)).sum();
+    let total: u64 = runnable.iter().map(|p| opts.work_bytes(p)).sum();
     let bar = make_bar(total, c.quiet);
     let started = Instant::now();
     let mut progress = CliProgress { bar: bar.clone(), verbose: c.verbose, item: String::new(), pass: String::new() };

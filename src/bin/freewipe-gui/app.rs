@@ -69,6 +69,8 @@ pub struct JobView {
     pub targets: Vec<Target>,
     pub opts: WipeOptions,
     pub total: u64,
+    /// Per target: on SSD/flash (decides the single-pass rule).
+    pub flash: Vec<bool>,
     pub done: u64,
     pub current: Option<usize>,
     pub item: String,
@@ -471,7 +473,17 @@ impl App {
 
     pub fn start_job(&mut self, targets: Vec<Target>, plans: &[PlanItem], opts: WipeOptions) {
         let passes = opts.pass_count();
-        let total = plans.iter().filter(|p| p.is_ok()).map(|p| p.work_bytes(passes, opts.verify)).sum();
+        let total = plans.iter().filter(|p| p.is_ok()).map(|p| opts.work_bytes(p)).sum();
+        let flash = targets
+            .iter()
+            .map(|t| {
+                plans
+                    .iter()
+                    .find(|p| p.target.path == t.path)
+                    .and_then(|p| p.media.as_ref())
+                    .is_some_and(|m| m.is_flash_likely())
+            })
+            .collect();
         freewipe::dlog!(
             "job start: {} targets, {} work bytes, keep_awake={}",
             targets.len(),
@@ -497,6 +509,7 @@ impl App {
             targets,
             opts,
             total,
+            flash,
             done: 0,
             current: None,
             item: String::new(),

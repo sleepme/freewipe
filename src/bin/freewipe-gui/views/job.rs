@@ -75,7 +75,7 @@ pub fn confirm_body(app: &mut App, ui: &mut Ui) -> ConfirmOutcome {
     let runnable: Vec<&PlanItem> = c.plans.iter().filter(|p| p.is_ok()).collect();
     let bytes: u64 = runnable.iter().map(|p| p.bytes).sum();
     let passes = c.opts.pass_count();
-    let work: u64 = runnable.iter().map(|p| p.work_bytes(passes, c.opts.verify)).sum();
+    let work: u64 = runnable.iter().map(|p| c.opts.work_bytes(p)).sum();
     let flash = runnable.iter().filter(|p| p.media.as_ref().map(|m| m.is_flash_likely()).unwrap_or(false)).count();
     let blocked: Vec<String> = c.plans.iter().filter_map(|p| p.blocked.clone()).collect();
     let word = tr!("cli.confirm_word");
@@ -107,7 +107,11 @@ pub fn confirm_body(app: &mut App, ui: &mut Ui) -> ConfirmOutcome {
                 ui.label(RichText::new(if ready { human_bytes(bytes) } else { "…".into() }).monospace());
                 ui.end_row();
                 ui.label(RichText::new(tr!("gui.c_method")).color(p.muted));
-                ui.label(format!("{} · {}", c.opts.method.name(), tr!("cli.passes_n", n = passes)));
+                let mut method = format!("{} · {}", c.opts.method.name(), tr!("cli.passes_n", n = passes));
+                if flash > 0 && c.opts.single_pass_applies(true) {
+                    method = format!("{method} · {}", tr!("gui.c_ssd_one_pass"));
+                }
+                ui.label(method);
                 ui.end_row();
                 if !compact {
                     ui.label(RichText::new(tr!("gui.c_verify")).color(p.muted));
@@ -303,7 +307,9 @@ pub fn show(app: &mut App, ui: &mut Ui) {
                 );
                 ui.label(RichText::new(format!("{}   {}", jv.pass, jv.stage)).monospace().size(12.0).color(p.muted));
                 ui.add_space(6.0);
-                let passes = jv.opts.method.passes(jv.opts.passes_override);
+                let flash = jv.current.and_then(|i| jv.flash.get(i)).copied().unwrap_or(false);
+                let eff = jv.opts.effective_for(flash);
+                let passes = eff.method.passes(eff.passes_override);
                 let cur_pass = jv.pass_i;
                 ui.horizontal_wrapped(|ui| {
                     for (i, ps) in passes.iter().enumerate().take(35) {

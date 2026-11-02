@@ -90,6 +90,29 @@ impl WipeOptions {
     pub fn pass_count(&self) -> usize {
         self.method.pass_count(self.passes_override)
     }
+
+    /// The options actually used for a target on SSD/flash (`flash = true`)
+    /// or other media: with `flash_single_pass`, flash gets one NIST Clear pass.
+    pub fn effective_for(&self, flash: bool) -> WipeOptions {
+        if self.single_pass_applies(flash) {
+            WipeOptions { method: Method::NistClear, passes_override: None, ..self.clone() }
+        } else {
+            self.clone()
+        }
+    }
+
+    /// Does the SSD/flash single-pass rule change the method for this medium?
+    pub fn single_pass_applies(&self, flash: bool) -> bool {
+        self.flash_single_pass && flash && self.method != Method::NistClear
+    }
+
+    /// Bytes the engine will write (and read back) for a planned target,
+    /// taking the SSD/flash single-pass rule into account.
+    pub fn work_bytes(&self, item: &crate::plan::PlanItem) -> u64 {
+        let flash = item.media.as_ref().is_some_and(|m| m.is_flash_likely());
+        let o = self.effective_for(flash);
+        item.work_bytes(o.pass_count(), o.verify)
+    }
 }
 
 /// Errors from the engine. Messages are localised.
@@ -295,9 +318,9 @@ fn execute_inner(target: &Target, opts: &WipeOptions, ctx: &mut Ctx) -> ReportIt
         opts
     };
     let single;
-    let opts = if opts.flash_single_pass && flash && opts.method != Method::NistClear {
+    let opts = if opts.single_pass_applies(flash) {
         ctx.progress.note(&tr!("note.ssd_single", method = opts.method.name()));
-        single = WipeOptions { method: Method::NistClear, passes_override: None, ..opts.clone() };
+        single = opts.effective_for(true);
         item.passes = 1;
         &single
     } else {
@@ -398,4 +421,39 @@ fn fill_from_dir(item: &mut ReportItem, r: &DirReport, opts: &WipeOptions) {
     item.access_denied = r.access_denied;
     item.failures = r.failures.clone();
     item.locked = r.locked.iter().map(|p| p.display().to_string()).collect();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::media::{MediaInfo, MediaKind};
+    use crate::plan::PlanItem;
+
+    fn item(kind: MediaKind) -> PlanItem {
+        PlanItem {
+            target: Target::file("x.bin"),
+            bytes: 100,
+            files: 1,
+            dirs: 0,
+            volume: None,
+            media: Some(MediaInfo { kind, trim: None, bus: None, model: None }),
+            blocked: None,
+            link: false,
+            shortcut: false,
+        }
+    }
+
+    #[test]
+    fn work_bytes_follow_ssd_single_pass() {
+        let mut o = WipeOptions { method: Method::DodE, verify: true, ..WipeOptions::default() };
+        // 3 passes + verification everywhere while the rule is off.
+        assert_eq!(o.work_bytes(&item(MediaKind::Ssd)), 400);
+        o.flash_single_pass = true;
+        // One pass + verification on SSD/flash, unchanged on HDD.
+        assert_eq!(o.work_bytes(&item(MediaKind::Ssd)), 200);
+        assert_eq!(o.work_bytes(&item(MediaKind::Flash)), 200);
+        assert_eq!(o.work_bytes(&item(MediaKind::Hdd)), 400);
+        assert_eq!(o.effective_for(true).method, Method::NistClear);
+        assert_eq!(o.effective_for(false).method, Method::DodE);
+    }
 }
