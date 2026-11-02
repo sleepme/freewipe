@@ -546,7 +546,7 @@
   "sched.failed": "Planificateur de tâches : {err}",
   "_name_en": "French",
   "_translators": "freewipe",
-  "_freewipe": "1.0.0",
+  "_freewipe": "1.0.1",
   "gui.passes_badge": "{n} passe(s)",
   "err.is_link": "{path} est un lien : seul le lien lui-même peut être supprimé (sa cible n'est jamais touchée).",
   "note.link_removed": "{path} est un lien : seul le lien a été supprimé ; sa cible est intacte.",

@@ -6,6 +6,8 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-02
+
 ### Changed
 - Text in the desktop app is no longer selectable, like in other Windows programs. The log, error messages, report paths and the "files in use" details can still be selected and copied.
 - Buttons react to the mouse: they change colour on hover and when pressed, and the pointer turns into a hand.
@@ -78,5 +80,6 @@ First public release.
 - The engine is usable as a Rust library (`app::set_identity`, `i18n::register_english`,
   `wipe::wipe_dir_contents`).
 
-[Unreleased]: https://github.com/sleepme/freewipe/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/sleepme/freewipe/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/sleepme/freewipe/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/sleepme/freewipe/releases/tag/v1.0.0

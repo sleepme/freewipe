@@ -898,7 +898,7 @@ dependencies = [
 
 [[package]]
 name = "freewipe"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -925,7 +925,7 @@ dependencies = [
 
 [[package]]
 name = "freewipe-shell"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "windows",
  "windows-core",

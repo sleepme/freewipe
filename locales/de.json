@@ -546,7 +546,7 @@
   "sched.failed": "Aufgabenplanung: {err}",
   "_name_en": "German",
   "_translators": "freewipe",
-  "_freewipe": "1.0.0",
+  "_freewipe": "1.0.1",
   "gui.passes_badge": "{n} Durchgang/Durchgänge",
   "err.is_link": "{path} ist eine Verknüpfung (Link): nur der Link selbst kann entfernt werden (sein Ziel wird nie angetastet).",
   "note.link_removed": "{path} ist ein Link: nur der Link wurde entfernt; sein Ziel bleibt unberührt.",

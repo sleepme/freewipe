@@ -546,7 +546,7 @@
   "sched.failed": "Programador de tareas: {err}",
   "_name_en": "Spanish",
   "_translators": "freewipe",
-  "_freewipe": "1.0.0",
+  "_freewipe": "1.0.1",
   "gui.passes_badge": "{n} pasada(s)",
   "err.is_link": "{path} es un vínculo: solo puede eliminarse el propio vínculo (su destino nunca se toca).",
   "note.link_removed": "{path} es un vínculo: se eliminó solo el vínculo; su destino no se ha tocado.",

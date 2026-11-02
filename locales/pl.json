@@ -546,7 +546,7 @@
   "sched.failed": "Harmonogram zadań: {err}",
   "_name_en": "Polish",
   "_translators": "freewipe",
-  "_freewipe": "1.0.0",
+  "_freewipe": "1.0.1",
   "gui.passes_badge": "przebiegi: {n}",
   "err.is_link": "{path} to łącze: usunąć można tylko samo łącze (jego cel nigdy nie jest zmieniany).",
   "note.link_removed": "{path} to łącze: usunięto tylko łącze; jego cel pozostał nietknięty.",

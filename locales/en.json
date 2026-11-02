@@ -546,7 +546,7 @@
   "sched.failed": "Task Scheduler: {err}",
   "_name_en": "English",
   "_translators": "freewipe",
-  "_freewipe": "1.0.0",
+  "_freewipe": "1.0.1",
   "gui.passes_badge": "{n} pass(es)",
   "err.is_link": "{path} is a link: only the link itself can be removed (its target is never touched).",
   "note.link_removed": "{path} is a link: removed the link only; what it points to is untouched.",
