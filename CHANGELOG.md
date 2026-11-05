@@ -6,6 +6,12 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Password protection for **Schedule** (create, change, run now or delete scheduled wipes), **Methods** (custom methods) and **Reports** (view, delete or wipe reports) — three new switches in *Settings → Safety → Password protection*, on by default when a password is set. One correct password unlocks every protected page until freewipe closes. Scheduled runs themselves never ask for it.
+
+### Changed
+- The progress log no longer shows a line for every alternate data stream (e.g. `Zone.Identifier` on each downloaded file), which flooded it when wiping large folders. The streams are still wiped; the debug log records them with the file path.
+
 ## [1.0.1] - 2026-11-02
 
 ### Changed

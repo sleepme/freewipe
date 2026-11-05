@@ -156,8 +156,9 @@ pub struct App {
     pub quick: bool,
     /// Password screen shown before anything else.
     pub locked: bool,
-    /// Settings already unlocked in this session.
-    pub settings_unlocked: bool,
+    /// The password was entered in this session: Settings, Schedule,
+    /// Methods and Reports stay unlocked until freewipe closes.
+    pub session_unlocked: bool,
     pub lock: LockInput,
     /// Password fields on the Safety tab.
     pub pw: PasswordForm,
@@ -238,7 +239,7 @@ impl App {
         let mut app = App {
             quick,
             locked,
-            settings_unlocked: unlocked,
+            session_unlocked: unlocked,
             lock: LockInput::default(),
             pw: PasswordForm::default(),
             foreign: if quick { Vec::new() } else { crate::shellops::foreign_entries() },

@@ -92,6 +92,9 @@ impl MethodEdit {
 }
 
 pub fn show(app: &mut App, ui: &mut Ui) {
+    if !super::lock::gate(app, ui, super::lock::Gated::Methods) {
+        return;
+    }
     let p = pal(ui);
     title(ui, &tr!("gui.methods_title"), |ui| {
         if widgets::secondary(ui, format!("+ {}", tr!("custom.new"))).clicked() {

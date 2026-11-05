@@ -40,6 +40,9 @@ fn load(dir: &std::path::Path) -> Vec<ReportRow> {
 }
 
 pub fn show(app: &mut App, ui: &mut Ui) {
+    if !super::lock::gate(app, ui, super::lock::Gated::Reports) {
+        return;
+    }
     let p = pal(ui);
     let dir = app.settings.report_dir();
     let mut refresh = false;

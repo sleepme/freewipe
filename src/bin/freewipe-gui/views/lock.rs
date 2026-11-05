@@ -1,4 +1,6 @@
-//! Password prompts: the app lock screen and the settings gate.
+//! Password prompts: the app lock screen and the page gates (Settings,
+//! Schedule, Methods, Reports). One correct password unlocks every gated
+//! page for the rest of the session.
 
 use std::time::Instant;
 
@@ -79,19 +81,41 @@ pub fn app_lock_screen(app: &mut App, ui: &mut Ui) {
         ui.add_space((ui.available_height() / 2.0 - 150.0).max(10.0));
         if prompt(app, ui, &tr!("lock.title"), &tr!("lock.sub")) {
             app.locked = false;
-            app.settings_unlocked = true;
+            app.session_unlocked = true;
         }
     });
 }
 
-/// Gate in front of the Settings screen. Returns `true` when unlocked.
-pub fn settings_gate(app: &mut App, ui: &mut Ui) -> bool {
-    if app.settings_unlocked || !app.settings.lock.settings_locked() {
+/// A page that can be put behind the password.
+#[derive(Clone, Copy)]
+pub enum Gated {
+    Settings,
+    Schedule,
+    Methods,
+    Reports,
+}
+
+/// Gate in front of a page. Returns `true` when the page may be shown.
+pub fn gate(app: &mut App, ui: &mut Ui, page: Gated) -> bool {
+    let lock = &app.settings.lock;
+    let locked = match page {
+        Gated::Settings => lock.settings_locked(),
+        Gated::Schedule => lock.schedule_locked(),
+        Gated::Methods => lock.methods_locked(),
+        Gated::Reports => lock.reports_locked(),
+    };
+    if app.session_unlocked || !locked {
         return true;
     }
+    let (title, sub) = match page {
+        Gated::Settings => (tr!("lock.settings_title"), tr!("lock.settings_sub")),
+        Gated::Schedule => (tr!("lock.schedule_title"), tr!("lock.schedule_sub")),
+        Gated::Methods => (tr!("lock.methods_title"), tr!("lock.methods_sub")),
+        Gated::Reports => (tr!("lock.reports_title"), tr!("lock.reports_sub")),
+    };
     ui.add_space(60.0);
-    if prompt(app, ui, &tr!("lock.settings_title"), &tr!("lock.settings_sub")) {
-        app.settings_unlocked = true;
+    if prompt(app, ui, &title, &sub) {
+        app.session_unlocked = true;
     }
     false
 }

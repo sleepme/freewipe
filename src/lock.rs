@@ -37,6 +37,13 @@ pub struct Lock {
     pub protect_settings: bool,
     /// Ask for the password every time a wipe starts.
     pub protect_wipe: bool,
+    /// Ask for the password before opening Schedule (create, change, run
+    /// now or delete scheduled wipes). Scheduled runs themselves never ask.
+    pub protect_schedule: bool,
+    /// Ask for the password before opening Methods (custom methods).
+    pub protect_methods: bool,
+    /// Ask for the password before opening Reports (view, delete, wipe).
+    pub protect_reports: bool,
     /// Unix time of the last change (newest record wins).
     pub updated: u64,
     /// Record lives in HKLM (all users).
@@ -56,9 +63,24 @@ impl Lock {
     pub fn wipe_locked(&self) -> bool {
         self.has_password() && self.protect_wipe
     }
+    pub fn schedule_locked(&self) -> bool {
+        self.has_password() && (self.protect_schedule || self.protect_app)
+    }
+    pub fn methods_locked(&self) -> bool {
+        self.has_password() && (self.protect_methods || self.protect_app)
+    }
+    pub fn reports_locked(&self) -> bool {
+        self.has_password() && (self.protect_reports || self.protect_app)
+    }
     /// Any protection active at all.
     pub fn active(&self) -> bool {
-        self.has_password() && (self.protect_app || self.protect_settings || self.protect_wipe)
+        self.has_password()
+            && (self.protect_app
+                || self.protect_settings
+                || self.protect_wipe
+                || self.protect_schedule
+                || self.protect_methods
+                || self.protect_reports)
     }
     /// Stamp the record as changed now.
     pub fn touch(&mut self) {
@@ -255,6 +277,26 @@ mod tests {
             hex(&pbkdf2_sha256(b"password", b"salt", 4096)),
             "c5e478d59288c841aa530db6845c4c8d962893a001ce4e11a4963873aa98134a"
         );
+    }
+
+    #[test]
+    fn page_locks() {
+        let mut l = Lock { protect_schedule: true, ..Lock::default() };
+        // No password: nothing is locked, whatever the switches say.
+        assert!(!l.schedule_locked() && !l.active());
+        l.set_password_with("x", 1);
+        assert!(l.schedule_locked() && !l.methods_locked() && !l.reports_locked() && l.active());
+        l.protect_methods = true;
+        l.protect_reports = true;
+        assert!(l.methods_locked() && l.reports_locked());
+        // "When freewipe starts" puts every page behind the password too.
+        let app_only =
+            Lock { protect_app: true, ..Lock { salt: l.salt.clone(), hash: l.hash.clone(), ..Lock::default() } };
+        assert!(app_only.schedule_locked() && app_only.methods_locked() && app_only.reports_locked());
+        // Records saved before these switches existed still load.
+        let old = r#"{"salt":"00","hash":"00","iterations":1,"protect_settings":true,"updated":1}"#;
+        let o: Lock = serde_json::from_str(old).unwrap();
+        assert!(o.protect_settings && !o.protect_schedule && !o.protect_methods && !o.protect_reports);
     }
 
     #[test]

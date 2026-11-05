@@ -13,7 +13,7 @@ use crate::widgets;
 
 pub fn show(app: &mut App, ui: &mut Ui) {
     let p = pal(ui);
-    if !super::lock::settings_gate(app, ui) {
+    if !super::lock::gate(app, ui, super::lock::Gated::Settings) {
         return;
     }
     // Narrow windows get a narrower tab list.
@@ -594,6 +594,9 @@ fn password(app: &mut App, ui: &mut Ui) {
             ui.checkbox(&mut app.settings.lock.protect_app, tr!("gui.pw_protect_app"));
             ui.checkbox(&mut app.settings.lock.protect_settings, tr!("gui.pw_protect_settings"));
             ui.checkbox(&mut app.settings.lock.protect_wipe, tr!("gui.pw_protect_wipe"));
+            ui.checkbox(&mut app.settings.lock.protect_schedule, tr!("gui.pw_protect_schedule"));
+            ui.checkbox(&mut app.settings.lock.protect_methods, tr!("gui.pw_protect_methods"));
+            ui.checkbox(&mut app.settings.lock.protect_reports, tr!("gui.pw_protect_reports"));
             if cfg!(windows) {
                 ui.add_space(4.0);
                 widgets::check_row(
@@ -619,6 +622,9 @@ fn password(app: &mut App, ui: &mut Ui) {
                         app.settings.lock.protect_app = old.protect_app;
                         app.settings.lock.protect_settings = old.protect_settings;
                         app.settings.lock.protect_wipe = old.protect_wipe;
+                        app.settings.lock.protect_schedule = old.protect_schedule;
+                        app.settings.lock.protect_methods = old.protect_methods;
+                        app.settings.lock.protect_reports = old.protect_reports;
                         app.settings.lock.machine = old.machine;
                         (true, tr!("gui.pw_changed"))
                     });
@@ -647,7 +653,10 @@ fn password(app: &mut App, ui: &mut Ui) {
                         app.settings.lock.protect_app = false;
                         app.settings.lock.protect_settings = true;
                         app.settings.lock.protect_wipe = true;
-                        app.settings_unlocked = true;
+                        app.settings.lock.protect_schedule = true;
+                        app.settings.lock.protect_methods = true;
+                        app.settings.lock.protect_reports = true;
+                        app.session_unlocked = true;
                         (true, tr!("gui.pw_set_ok"))
                     }
                 });

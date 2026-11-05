@@ -260,6 +260,9 @@ fn result_text(st: &TaskState) -> String {
 }
 
 pub fn show(app: &mut App, ui: &mut Ui) {
+    if !super::lock::gate(app, ui, super::lock::Gated::Schedule) {
+        return;
+    }
     let p = pal(ui);
     let mut new = false;
     let mut refresh = false;
